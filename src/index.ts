@@ -1,7 +1,8 @@
 import * as koffi from 'koffi';
 import { promisify } from 'util';
+import path from 'path';
 
-const lib = koffi.load('./dist/libKeychainLibrary.dylib');
+const lib = koffi.load(path.join(__dirname, '../dist/libKeychainLibrary.dylib'));
 
 export interface SetPasswordParams {
     password: string;
