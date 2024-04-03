@@ -1,4 +1,4 @@
-import * as keychain from '../dist/main.js';
+import * as keychain from '../src';
 
 console.log(`Adding to keychain...`);
 
