@@ -50,3 +50,9 @@ export const getPassword = async (params: GetPasswordParams): Promise<string> =>
 
     return secretResult;
 };
+
+export const isBiometricsSupported = (): boolean => {
+    const biometricsSupported = lib.func('isBiometricsSupported', 'bool', []);
+
+    return biometricsSupported() as boolean;
+};
