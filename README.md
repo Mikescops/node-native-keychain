@@ -28,12 +28,13 @@ const secret = await keychain.getPassword({ service: 'my-service', requireBiomet
 
 ## Available methods
 
-| Method                  | Description                            |
-| ----------------------- | -------------------------------------- |
-| `getPassword`           | Retrieve a password from the keychain. |
-| `setPassword`           | Store a password in the keychain.      |
-| `deletePassword`        | Delete a password from the keychain.   |
-| `isBiometricsSupported` | Check if biometrics is supported.      |
+| Method                          | Description                            | Output             |
+| ------------------------------- | -------------------------------------- | ------------------ |
+| `getPassword`                   | Retrieve a password from the keychain. | `Promise<string>`  |
+| `setPassword`                   | Store a password in the keychain.      | `void`             |
+| `deletePassword`                | Delete a password from the keychain.   | `void`             |
+| `isBiometricsSupported`         | Check if biometrics is supported.      | `boolean`          |
+| `requestBiometricsVerification` | Request biometrics verification.       | `Promise<boolean>` |
 
 ## Maintainer
 
