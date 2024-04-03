@@ -1,0 +1,65 @@
+{
+    "name": "native-keychain",
+    "version": "1.0.0",
+    "description": "A native keychain module for Node.js written in Swift and TypeScript",
+    "source": "src/index.ts",
+    "main": "dist/main.js",
+    "module": "dist/module.js",
+    "types": "dist/types.d.ts",
+    "scripts": {
+        "prebuild": "swift build --configuration=release --arch arm64 --arch x86_64",
+        "watch": "parcel watch",
+        "build": "parcel build",
+        "lint": "tsc --noEmit && eslint \"src/**/*.ts{,x}\"",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Corentin Mors <corentin@pixelswap.fr>",
+    "license": "MIT",
+    "targets": {
+        "module": {
+            "isLibrary": true,
+            "context": "node"
+        },
+        "main": {
+            "isLibrary": true,
+            "context": "node"
+        }
+    },
+    "dependencies": {
+        "koffi": "^2.8.0"
+    },
+    "devDependencies": {
+        "@parcel/packager-ts": "^2.10.3",
+        "@parcel/transformer-typescript-tsc": "^2.10.3",
+        "@parcel/transformer-typescript-types": "^2.10.3",
+        "@types/elementtree": "^0.1.5",
+        "@types/node": "^18.11.18",
+        "@typescript-eslint/eslint-plugin": "^6.16.0",
+        "@typescript-eslint/parser": "^6.16.0",
+        "eslint": "^8.56.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-prettier": "^5.1.2",
+        "parcel": "^2.10.3",
+        "parcel-reporter-static-files-copy": "^1.5.3",
+        "prettier": "^3.1.1",
+        "typescript": "^5.3.3"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Mikescops/node-native-keychain.git"
+    },
+    "@parcel/transformer-js": {
+        "inlineFS": false
+    },
+    "files": [
+        "dist"
+    ],
+    "staticFiles": [
+        {
+          "staticPath": ".build/apple/Products/Release/libKeychainLibrary.dylib"
+        }
+    ],
+    "engines": {
+        "node": ">=18.20.0"
+    }
+}

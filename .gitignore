@@ -1,0 +1,7 @@
+.build
+.parcel-cache
+dist
+node_modules
+.vscode
+KeychainLibrary
+package/

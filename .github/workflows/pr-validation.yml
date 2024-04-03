@@ -1,0 +1,25 @@
+name: Lint & Build CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    build:
+        runs-on: macos-14 # ARM64
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js 18.20.x
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 18.20.x
+            - name: Use Swift 5.9
+              uses: swift-actions/setup-swift@v2
+              with:
+                  swift-version: 5.9
+            - run: npm ci
+            - run: npm run lint
+            - run: npm run build

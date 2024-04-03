@@ -1,0 +1,24 @@
+name: Publish Package to npmjs
+
+on:
+    release:
+        types: [created]
+
+jobs:
+    build:
+        runs-on: macos-14
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18.20.x
+                  registry-url: 'https://registry.npmjs.org'
+            - name: Use Swift 5.9
+              uses: swift-actions/setup-swift@v2
+              with:
+                  swift-version: 5.9
+            - run: npm ci && npm run build
+            - name: Publish package on NPM 📦
+              run: npm publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
