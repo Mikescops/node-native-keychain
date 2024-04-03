@@ -56,3 +56,13 @@ export const isBiometricsSupported = (): boolean => {
 
     return biometricsSupported() as boolean;
 };
+
+interface DeletePasswordParams {
+    service: string;
+}
+
+export const deletePassword = (params: DeletePasswordParams): boolean => {
+    const deleteFromKeychain = lib.func('deleteFromKeychain', 'bool', ['string']);
+
+    return deleteFromKeychain(params.service) as boolean;
+};
