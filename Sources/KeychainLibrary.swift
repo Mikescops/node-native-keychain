@@ -132,6 +132,19 @@ func _getPassword(context: LAContext, service: String, completion: @escaping (Re
     }
 }
 
+@_cdecl("deleteFromKeychain")
+public func deleteFromKeychain(cStringService: UnsafePointer<Int8>) -> Bool {
+    let service = String(cString: cStringService)
+    
+    let query: [String: Any] = [
+        kSecClass as String: kSecClassGenericPassword,
+        kSecAttrService as String: service
+    ]
+    
+    let status = SecItemDelete(query as CFDictionary)
+    return status == errSecSuccess
+}
+
 @_cdecl("isBiometricsSupported")
 public func isBiometricsSupported() -> Bool {
         let context = LAContext()

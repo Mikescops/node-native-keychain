@@ -16,6 +16,8 @@ npm install native-keychain
 
 ## Usage
 
+> **Note:** For the moment, we only store [Generic passwords](https://developer.apple.com/documentation/security/ksecclassgenericpassword) in the keychain.
+
 ```typescript
 import * as keychain from 'native-keychain';
 
@@ -23,6 +25,15 @@ keychain.setPassword({ service: 'my-service', password: 'my-password' });
 
 const secret = await keychain.getPassword({ service: 'my-service', requireBiometrics: true }); // 'my-password'
 ```
+
+## Available methods
+
+| Method                  | Description                            |
+| ----------------------- | -------------------------------------- |
+| `getPassword`           | Retrieve a password from the keychain. |
+| `setPassword`           | Store a password in the keychain.      |
+| `deletePassword`        | Delete a password from the keychain.   |
+| `isBiometricsSupported` | Check if biometrics is supported.      |
 
 ## Maintainer
 
