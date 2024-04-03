@@ -131,3 +131,11 @@ func _getPassword(context: LAContext, service: String, completion: @escaping (Re
         completion(.failure(.cannotRetrieve("Failed to retrieve data from keychain")))
     }
 }
+
+@_cdecl("isBiometricsSupported")
+public func isBiometricsSupported() -> Bool {
+        let context = LAContext()
+        return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+    
+    return false
+}

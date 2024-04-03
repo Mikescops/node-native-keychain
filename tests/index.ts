@@ -1,5 +1,10 @@
 import * as keychain from '../src';
 
+if (!keychain.isBiometricsSupported()) {
+    console.error(`Keychain is not supported on this platform`);
+    process.exit(1);
+}
+
 console.log(`Adding to keychain...`);
 
 const isSuccess2 = keychain.setPassword({
