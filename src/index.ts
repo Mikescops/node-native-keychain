@@ -51,12 +51,6 @@ export const getPassword = async (params: GetPasswordParams): Promise<string> =>
     return secretResult;
 };
 
-export const isBiometricsSupported = (): boolean => {
-    const biometricsSupported = lib.func('isBiometricsSupported', 'bool', []);
-
-    return biometricsSupported() as boolean;
-};
-
 interface DeletePasswordParams {
     service: string;
 }
@@ -65,4 +59,39 @@ export const deletePassword = (params: DeletePasswordParams): boolean => {
     const deleteFromKeychain = lib.func('deleteFromKeychain', 'bool', ['string']);
 
     return deleteFromKeychain(params.service) as boolean;
+};
+
+export const isBiometricsSupported = (): boolean => {
+    const biometricsSupported = lib.func('isBiometricsSupported', 'bool', []);
+
+    return biometricsSupported() as boolean;
+};
+
+interface RequestBiometricsVerificationParams {
+    reason: string;
+}
+
+export const requestBiometricsVerification = async (params: RequestBiometricsVerificationParams): Promise<boolean> => {
+    const protoCallback = koffi.proto('biometricsCallback', 'void', ['bool']);
+
+    let result: boolean | undefined;
+
+    const resultCallback = (cb: boolean) => {
+        result = cb;
+    };
+
+    const requestBiometricsVerification = lib.func('requestBiometricsVerification', 'void', [
+        'string',
+        koffi.pointer(protoCallback)
+    ]);
+
+    const requestBiometricsVerificationAsync = promisify(requestBiometricsVerification.async);
+
+    await requestBiometricsVerificationAsync(params.reason, resultCallback);
+
+    if (result === undefined) {
+        throw new Error(`Biometrics verification failed`);
+    }
+
+    return result;
 };

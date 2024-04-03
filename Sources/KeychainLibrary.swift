@@ -147,8 +147,31 @@ public func deleteFromKeychain(cStringService: UnsafePointer<Int8>) -> Bool {
 
 @_cdecl("isBiometricsSupported")
 public func isBiometricsSupported() -> Bool {
-        let context = LAContext()
-        return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
-    
-    return false
+    let context = LAContext()
+    return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+}
+
+@_cdecl("requestBiometricsVerification")
+public func requestBiometricsVerification(cStringReason: UnsafePointer<Int8>, callback: @escaping @convention(c) (Bool) -> Void) {
+    let semaphore = DispatchSemaphore(value: 0)
+    let reason = String(cString: cStringReason)
+    let context = LAContext()
+
+     // Check if biometric authentication is available
+    var error: NSError?
+    guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+        callback(false)
+        return
+    }
+
+    context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, evaluateError in
+        if success {
+            callback(true)
+        } else {
+            callback(false)
+        }
+        semaphore.signal()
+    }
+
+    semaphore.wait()
 }
