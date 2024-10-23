@@ -10,6 +10,42 @@ void (async () => {
 
     console.log(`Biometrics verification result: ${authCheck ? '👍' : '👎'}`);
 
+    console.log('Testing with account...');
+
+    const addAccount = keychain.setPassword({
+        password: 'toto',
+        service: 'com.example.toto.secret',
+        account: 'myAccount'
+    });
+    if (addAccount) {
+        console.log('add');
+    } else {
+        console.error('Failed to add with account');
+        process.exit(1);
+    }
+
+    const getAccount = await keychain.getPassword({
+        service: 'com.example.toto.secret',
+        account: 'myAccount'
+    });
+    if (getAccount === 'toto') {
+        console.log('get', getAccount);
+    } else {
+        console.error('Failed to get with account');
+        process.exit(1);
+    }
+
+    const deleteAccount = keychain.deletePassword({
+        service: 'com.example.toto.secret',
+        account: 'myAccount'
+    });
+    if (deleteAccount) {
+        console.log('delete');
+    } else {
+        console.error('Failed to delete with account');
+        process.exit(1);
+    }
+
     console.log(`Adding to keychain...`);
 
     const isSuccess2 = keychain.setPassword({
@@ -40,6 +76,16 @@ void (async () => {
         console.log(`I'm alive ${i++}`);
         if (i === 10 || mySecret) {
             console.log('My secret:', mySecret ?? "Couldn't get it in time");
+
+            const isDeleted = keychain.deletePassword({ service: 'com.example.toto.secret' });
+
+            if (isDeleted) {
+                console.log(`Successfully deleted from keychain`);
+            } else {
+                console.error(`Failed to delete from keychain`);
+                process.exit(1);
+            }
+
             console.log(`Exiting...`);
             process.exit(0);
         }

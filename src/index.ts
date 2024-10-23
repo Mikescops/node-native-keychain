@@ -7,25 +7,26 @@ const lib = koffi.load(path.join(__dirname, '../dist/libKeychainLibrary.dylib'))
 export interface SetPasswordParams {
     password: string;
     service: string;
+    account?: string;
 }
 
 export const setPassword = (params: SetPasswordParams): boolean => {
-    const { password, service } = params;
+    const { password, service, account = '' } = params;
 
-    const addToKeychain = lib.func('addToKeychain', 'bool', ['string', 'string']);
+    const addToKeychain = lib.func('addToKeychain', 'bool', ['string', 'string', 'string']);
 
-    return addToKeychain(password, service) as boolean;
+    return addToKeychain(password, service, account) as boolean;
 };
 
 export interface GetPasswordParams {
     service: string;
+    account?: string;
     requireBiometry?: boolean;
 }
 
+const protoCallback = koffi.proto('keychainCallback', 'void', ['string', 'string']);
 export const getPassword = async (params: GetPasswordParams): Promise<string> => {
-    const { service, requireBiometry } = params;
-
-    const protoCallback = koffi.proto('keychainCallback', 'void', ['string', 'string']);
+    const { service, account = '', requireBiometry = false } = params;
 
     let errorResult: string | undefined;
     let secretResult: string | undefined;
@@ -38,11 +39,17 @@ export const getPassword = async (params: GetPasswordParams): Promise<string> =>
         }
     };
 
-    const getFromKeychain = lib.func('getFromKeychain', 'void', ['string', 'bool', koffi.pointer(protoCallback)]);
+    const getFromKeychain = lib.func('getFromKeychain', 'void', [
+        'string',
+        'string',
+        'bool',
+        koffi.pointer(protoCallback)
+    ]);
 
     const getFromKeychainAsync = promisify(getFromKeychain.async);
 
-    await getFromKeychainAsync(service, requireBiometry ? true : false, contentCallback);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    await getFromKeychainAsync(service, account, Boolean(requireBiometry), contentCallback);
 
     if (errorResult) {
         throw new Error(errorResult);
@@ -53,12 +60,14 @@ export const getPassword = async (params: GetPasswordParams): Promise<string> =>
 
 interface DeletePasswordParams {
     service: string;
+    account?: string;
 }
 
 export const deletePassword = (params: DeletePasswordParams): boolean => {
-    const deleteFromKeychain = lib.func('deleteFromKeychain', 'bool', ['string']);
+    const { service, account = '' } = params;
+    const deleteFromKeychain = lib.func('deleteFromKeychain', 'bool', ['string', 'string']);
 
-    return deleteFromKeychain(params.service) as boolean;
+    return deleteFromKeychain(service, account) as boolean;
 };
 
 export const isBiometricsSupported = (): boolean => {
@@ -87,6 +96,7 @@ export const requestBiometricsVerification = async (params: RequestBiometricsVer
 
     const requestBiometricsVerificationAsync = promisify(requestBiometricsVerification.async);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await requestBiometricsVerificationAsync(params.reason, resultCallback);
 
     if (result === undefined) {

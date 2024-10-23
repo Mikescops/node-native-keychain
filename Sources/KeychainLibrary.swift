@@ -4,11 +4,10 @@ import Security
 
 // Function to add data to keychain with biometrics protection
 @_cdecl("addToKeychain")
-public func addToKeychain(cStringData: UnsafePointer<Int8>, cStringService: UnsafePointer<Int8>)
-    -> Bool
-{
+public func addToKeychain(cStringData: UnsafePointer<Int8>, cStringService: UnsafePointer<Int8>, cStringAccount: UnsafePointer<Int8>) -> Bool {
     let data = String(cString: cStringData).data(using: .utf8)!
     let service = String(cString: cStringService)
+    let account = String(cString: cStringAccount)
 
     if #available(macOS 10.13.4, *) {
         let context = LAContext()
@@ -25,6 +24,7 @@ public func addToKeychain(cStringData: UnsafePointer<Int8>, cStringService: Unsa
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
             kSecValueData as String: data,
             kSecUseAuthenticationContext as String: context,
         ]
@@ -45,6 +45,7 @@ public func addToKeychain(cStringData: UnsafePointer<Int8>, cStringService: Unsa
 @_cdecl("getFromKeychain")
 public func getFromKeychain(
     cStringService: UnsafePointer<Int8>,
+    cStringAccount: UnsafePointer<Int8>,
     requireBiometrics: Bool,
     callback: @escaping @convention(c) (
         UnsafePointer<Int8>?, UnsafePointer<Int8>?
@@ -54,7 +55,8 @@ public func getFromKeychain(
 
     do {
         let service = String(cString: cStringService)
-        try _getFromKeychain(service: service, requireBiometrics: requireBiometrics) { result in
+        let account = String(cString: cStringAccount)
+        try _getFromKeychain(service: service, account: account, requireBiometrics: requireBiometrics) { result in
             switch result {
             case .success(let data):
                 callback(nil, data)
@@ -78,10 +80,7 @@ enum BiometricAuthenticationError: Error {
     case unknown(String)
 }
 
-func _getFromKeychain(
-    service: String, requireBiometrics: Bool,
-    completion: @escaping @Sendable (Result<String, BiometricAuthenticationError>) -> Void
-) throws {
+func _getFromKeychain(service: String, account: String, requireBiometrics: Bool, completion: @escaping (Result<String, BiometricAuthenticationError>) -> Void) throws {
     let context = LAContext()
 
     // Check if biometric authentication is available
@@ -105,7 +104,7 @@ func _getFromKeychain(
         context.evaluatePolicy(policy, localizedReason: "Access to your secret") {
             success, evaluateError in
             if success {
-                _getPassword(context: context, service: service, completion: completion)
+                _getPassword(context: context, service: service, account: account, completion: completion)
             } else {
                 if let error = evaluateError {
                     completion(
@@ -118,17 +117,15 @@ func _getFromKeychain(
             }
         }
     } else {
-        _getPassword(context: context, service: service, completion: completion)
+        _getPassword(context: context, service: service, account: account, completion: completion)
     }
 }
 
-func _getPassword(
-    context: LAContext, service: String,
-    completion: @escaping @Sendable (Result<String, BiometricAuthenticationError>) -> Void
-) {
+func _getPassword(context: LAContext, service: String, account: String, completion: @escaping (Result<String, BiometricAuthenticationError>) -> Void) {
     let query: [String: Any] = [
         kSecClass as String: kSecClassGenericPassword,
         kSecAttrService as String: service,
+        kSecAttrAccount as String: account,
         kSecUseAuthenticationContext as String: context,
         kSecReturnData as String: true,
     ]
@@ -148,12 +145,14 @@ func _getPassword(
 }
 
 @_cdecl("deleteFromKeychain")
-public func deleteFromKeychain(cStringService: UnsafePointer<Int8>) -> Bool {
+public func deleteFromKeychain(cStringService: UnsafePointer<Int8>, cStringAccount: UnsafePointer<Int8>) -> Bool {
     let service = String(cString: cStringService)
+    let account = String(cString: cStringAccount)
 
     let query: [String: Any] = [
         kSecClass as String: kSecClassGenericPassword,
         kSecAttrService as String: service,
+        kSecAttrAccount as String: account
     ]
 
     let status = SecItemDelete(query as CFDictionary)
