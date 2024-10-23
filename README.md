@@ -21,9 +21,17 @@ npm install native-keychain
 ```typescript
 import * as keychain from 'native-keychain';
 
-keychain.setPassword({ service: 'my-service', password: 'my-password' });
+keychain.setPassword({
+  service: 'my-service',
+  account: 'my-account',
+  password: 'my-password'
+});
 
-const secret = await keychain.getPassword({ service: 'my-service', requireBiometrics: true }); // 'my-password'
+const secret = await keychain.getPassword({
+  service: 'my-service',
+  account: 'my-account',
+  requireBiometrics: true
+}); // 'my-password'
 ```
 
 ## Available methods
