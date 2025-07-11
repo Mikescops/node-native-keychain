@@ -4,7 +4,10 @@ import Security
 
 // Function to add data to keychain with biometrics protection
 @_cdecl("addToKeychain")
-public func addToKeychain(cStringData: UnsafePointer<Int8>, cStringService: UnsafePointer<Int8>, cStringAccount: UnsafePointer<Int8>) -> Bool {
+public func addToKeychain(
+    cStringData: UnsafePointer<Int8>, cStringService: UnsafePointer<Int8>,
+    cStringAccount: UnsafePointer<Int8>
+) -> Bool {
     let data = String(cString: cStringData).data(using: .utf8)!
     let service = String(cString: cStringService)
     let account = String(cString: cStringAccount)
@@ -56,7 +59,9 @@ public func getFromKeychain(
     do {
         let service = String(cString: cStringService)
         let account = String(cString: cStringAccount)
-        try _getFromKeychain(service: service, account: account, requireBiometrics: requireBiometrics) { result in
+        try _getFromKeychain(
+            service: service, account: account, requireBiometrics: requireBiometrics
+        ) { result in
             switch result {
             case .success(let data):
                 callback(nil, data)
@@ -80,7 +85,10 @@ enum BiometricAuthenticationError: Error {
     case unknown(String)
 }
 
-func _getFromKeychain(service: String, account: String, requireBiometrics: Bool, completion: @escaping (Result<String, BiometricAuthenticationError>) -> Void) throws {
+func _getFromKeychain(
+    service: String, account: String, requireBiometrics: Bool,
+    completion: @escaping (Result<String, BiometricAuthenticationError>) -> Void
+) throws {
     let context = LAContext()
 
     // Check if biometric authentication is available
@@ -104,7 +112,8 @@ func _getFromKeychain(service: String, account: String, requireBiometrics: Bool,
         context.evaluatePolicy(policy, localizedReason: "Access to your secret") {
             success, evaluateError in
             if success {
-                _getPassword(context: context, service: service, account: account, completion: completion)
+                _getPassword(
+                    context: context, service: service, account: account, completion: completion)
             } else {
                 if let error = evaluateError {
                     completion(
@@ -121,7 +130,10 @@ func _getFromKeychain(service: String, account: String, requireBiometrics: Bool,
     }
 }
 
-func _getPassword(context: LAContext, service: String, account: String, completion: @escaping (Result<String, BiometricAuthenticationError>) -> Void) {
+func _getPassword(
+    context: LAContext, service: String, account: String,
+    completion: @escaping (Result<String, BiometricAuthenticationError>) -> Void
+) {
     let query: [String: Any] = [
         kSecClass as String: kSecClassGenericPassword,
         kSecAttrService as String: service,
@@ -145,14 +157,16 @@ func _getPassword(context: LAContext, service: String, account: String, completi
 }
 
 @_cdecl("deleteFromKeychain")
-public func deleteFromKeychain(cStringService: UnsafePointer<Int8>, cStringAccount: UnsafePointer<Int8>) -> Bool {
+public func deleteFromKeychain(
+    cStringService: UnsafePointer<Int8>, cStringAccount: UnsafePointer<Int8>
+) -> Bool {
     let service = String(cString: cStringService)
     let account = String(cString: cStringAccount)
 
     let query: [String: Any] = [
         kSecClass as String: kSecClassGenericPassword,
         kSecAttrService as String: service,
-        kSecAttrAccount as String: account
+        kSecAttrAccount as String: account,
     ]
 
     let status = SecItemDelete(query as CFDictionary)
