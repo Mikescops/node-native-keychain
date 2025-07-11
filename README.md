@@ -22,15 +22,15 @@ npm install native-keychain
 import * as keychain from 'native-keychain';
 
 keychain.setPassword({
-  service: 'my-service',
-  account: 'my-account',
-  password: 'my-password'
+    service: 'my-service',
+    account: 'my-account',
+    password: 'my-password'
 });
 
 const secret = await keychain.getPassword({
-  service: 'my-service',
-  account: 'my-account',
-  requireBiometrics: true
+    service: 'my-service',
+    account: 'my-account',
+    requireBiometrics: true
 }); // 'my-password'
 ```
 
@@ -43,6 +43,35 @@ const secret = await keychain.getPassword({
 | `deletePassword`                | Delete a password from the keychain.   | `void`             |
 | `isBiometricsSupported`         | Check if biometrics is supported.      | `boolean`          |
 | `requestBiometricsVerification` | Request biometrics verification.       | `Promise<boolean>` |
+
+## Development
+
+### Running Tests
+
+```bash
+npm run test
+```
+
+**Note:** The tests require user interaction for biometric authentication. When prompted, please authenticate using Touch ID, Face ID, or your system password to complete the biometric verification tests.
+
+The test suite includes:
+
+- Biometric support verification
+- Password storage and retrieval with accounts
+- Biometric-protected password operations
+- Cleanup and error handling
+
+### Building
+
+```bash
+npm run build
+```
+
+### Linting
+
+```bash
+npm run lint
+```
 
 ## Maintainer
 

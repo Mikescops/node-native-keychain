@@ -1,10 +1,17 @@
 {
     "compilerOptions": {
         "lib": ["ES2021"],
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "target": "ES2021",
         "experimentalDecorators": true,
         "isolatedModules": true,
         "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         "resolveJsonModule": true,
         "types": ["node"]
+    },
+    "ts-node": {
+        "esm": true
     }
 }

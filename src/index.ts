@@ -1,6 +1,10 @@
-import * as koffi from 'koffi';
+import koffi from 'koffi';
 import { promisify } from 'util';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const lib = koffi.load(path.join(__dirname, '../dist/libKeychainLibrary.dylib'));
 
@@ -25,7 +29,7 @@ export interface GetPasswordParams {
 }
 
 const protoCallback = koffi.proto('keychainCallback', 'void', ['string', 'string']);
-export const getPassword = async (params: GetPasswordParams): Promise<string> => {
+export const getPassword = async (params: GetPasswordParams) => {
     const { service, account = '', requireBiometry = false } = params;
 
     let errorResult: string | undefined;
@@ -80,7 +84,7 @@ interface RequestBiometricsVerificationParams {
     reason: string;
 }
 
-export const requestBiometricsVerification = async (params: RequestBiometricsVerificationParams): Promise<boolean> => {
+export const requestBiometricsVerification = async (params: RequestBiometricsVerificationParams) => {
     const protoCallback = koffi.proto('biometricsCallback', 'void', ['bool']);
 
     let result: boolean | undefined;
