@@ -4,6 +4,9 @@ import PackageDescription
 
 let package = Package(
     name: "KeychainLibrary",
+    platforms: [
+        .macOS(.v10_15)
+    ],
     products: [
         .library(
             name: "KeychainLibrary",
@@ -13,7 +16,11 @@ let package = Package(
     targets: [
         .target(
             name: "KeychainLibrary",
-            dependencies: [])
-    ]
+            dependencies: [],
+            swiftSettings: [
+                .swiftLanguageMode(.v5)
+            ])
+    ],
+    swiftLanguageModes: [.v5]
 )
 
