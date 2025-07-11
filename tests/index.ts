@@ -1,4 +1,4 @@
-import * as keychain from '../src';
+import * as keychain from '../src/index.js';
 
 void (async () => {
     if (!keychain.isBiometricsSupported()) {
