@@ -11,7 +11,7 @@ let package = Package(
         .library(
             name: "KeychainLibrary",
             type: .dynamic,
-            targets: ["KeychainLibrary"]),
+            targets: ["KeychainLibrary"])
     ],
     targets: [
         .target(
@@ -23,4 +23,3 @@ let package = Package(
     ],
     swiftLanguageModes: [.v5]
 )
-
