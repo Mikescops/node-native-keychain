@@ -52,32 +52,23 @@ public func getFromKeychain(
 ) {
     let semaphore = DispatchSemaphore(value: 0)
 
-    var resultData: String?
-    var resultError: Error?
-
     do {
         let service = String(cString: cStringService)
         try _getFromKeychain(service: service, requireBiometrics: requireBiometrics) { result in
             switch result {
             case .success(let data):
-                resultData = data
+                callback(nil, data)
             case .failure(let error):
-                resultError = error
+                callback(error.localizedDescription, nil)
             }
             semaphore.signal()
         }
     } catch {
-        resultError = error
+        callback(error.localizedDescription, nil)
         semaphore.signal()
     }
 
     semaphore.wait()
-
-    if let data = resultData {
-        return callback(nil, data)
-    }
-
-    callback(resultError?.localizedDescription, nil)
 }
 
 enum BiometricAuthenticationError: Error {
@@ -89,7 +80,7 @@ enum BiometricAuthenticationError: Error {
 
 func _getFromKeychain(
     service: String, requireBiometrics: Bool,
-    completion: @escaping (Result<String, BiometricAuthenticationError>) -> Void
+    completion: @escaping @Sendable (Result<String, BiometricAuthenticationError>) -> Void
 ) throws {
     let context = LAContext()
 
@@ -133,7 +124,7 @@ func _getFromKeychain(
 
 func _getPassword(
     context: LAContext, service: String,
-    completion: @escaping (Result<String, BiometricAuthenticationError>) -> Void
+    completion: @escaping @Sendable (Result<String, BiometricAuthenticationError>) -> Void
 ) {
     let query: [String: Any] = [
         kSecClass as String: kSecClassGenericPassword,
