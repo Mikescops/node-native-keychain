@@ -16,7 +16,7 @@ jobs:
             - name: Use Swift 6.1
               uses: swift-actions/setup-swift@v2
               with:
-                  swift-version: 6.1
+                  swift-version: 6.1.0
             - run: npm ci && npm run build
             - name: Publish package on NPM 📦
               run: npm publish
